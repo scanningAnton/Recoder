@@ -30,8 +30,8 @@ class Scanner
                             'tags' => $tags,
                             'timestamp' => time()
                         ];
-                        exec("php Recorder.php $username $url > /dev/null 2>&1 &");
-                        #echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s').".ts \n");
+                        #exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                        echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s').".ts \n");
 
                     }
                 }
@@ -43,10 +43,7 @@ class Scanner
         }
     }
 
-    /**
-     * @return array|false
-     */
-    protected function readWishList()
+    protected function readWishList() : array
     {
         $wish_list = [];
         if (file_exists(self::WISH_LIST)) {
@@ -58,6 +55,10 @@ class Scanner
                 $wish_list = array_map('strtolower', $wish_list);
             }
             $wish_list = array_flip($wish_list);
+            echo sprintf("Found %s entries in wishlist.\n", count($wish_list));
+        }
+        if($wish_list === false){
+            return [];
         }
         return $wish_list;
     }
