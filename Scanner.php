@@ -4,8 +4,10 @@ class Scanner
 {
     const WISH_LIST = 'wishlist.txt';
     const GRABBER_URL = 'https://www.cam4.com/directoryCams?directoryJson=true&online=true&url=true&username=';
+    const GIST = 'https://gist.githubusercontent.com/scanningAnton/cb4a2bac7bc5b570a99c6210ad7e36a7/raw';
 
     public function run() {
+        $this->refreshWishList();
         $wish_list = $this->readWishList();
         if(sizeof($wish_list) > 0) {
             while(true){
@@ -28,7 +30,9 @@ class Scanner
                             'tags' => $tags,
                             'timestamp' => time()
                         ];
-                        exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                        #exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                        echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s').".ts \n");
+
                     }
                 }
                 $time_out = rand(30, 120);
@@ -42,7 +46,7 @@ class Scanner
     /**
      * @return array|false
      */
-    public function readWishList()
+    protected function readWishList()
     {
         $wish_list = [];
         if (file_exists(self::WISH_LIST)) {
@@ -56,6 +60,14 @@ class Scanner
             $wish_list = array_flip($wish_list);
         }
         return $wish_list;
+    }
+
+    protected function refreshWishList()
+    {
+        $wishlist = file_get_contents(self::GIST);
+        if(strlen($wishlist) > 0) {
+            file_put_contents(self::WISH_LIST, $wishlist);
+        }
     }
 }
 $recorder = new Scanner();
