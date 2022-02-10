@@ -35,7 +35,7 @@ class Scanner
 
                     }
                 }
-                $time_out = rand(1, 10);
+                $time_out = rand(60, 120);
                 echo "Sleeping for $time_out seconds.\n";
                 sleep($time_out);
                 #exit();
