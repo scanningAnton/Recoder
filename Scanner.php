@@ -11,34 +11,10 @@ class Scanner
                 $this->refreshWishList();
                 $wish_list = $this->readWishList();
                 if(sizeof($wish_list) > 0) {
-                $active_cache = [];
-                foreach($wish_list as $username => $line) {
-                    $json = file_get_contents(self::GRABBER_URL . $username);
-                    $obj = json_decode($json);
-
-                    foreach($obj->users as $elem) {
-                        $username = strtolower($elem->username);
-                        $url = $elem->hlsPreviewUrl;
-                        $tags = $elem->showTags;
-
-                        if($url === '' || $username === '') {
-                            echo "$username has no active url.\n";
-                            continue;
-                        }
-                        $active_cache["$username"] = [
-                            'url' => $url,
-                            'tags' => $tags,
-                            'timestamp' => time()
-                        ];
-                        exec("php Recorder.php $username $url > /dev/null 2>&1 &");
-                        echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s').".ts \n");
-
-                    }
-                }
-                $time_out = rand(60, 120);
-                echo "Sleeping for $time_out seconds.\n";
-                sleep($time_out);
-                #exit();
+                    $this->checkOnlineWithApi($wish_list);
+                    $time_out = rand(60, 120);
+                    echo "Sleeping for $time_out seconds.\n";
+                    sleep($time_out);
             }
         }
     }
@@ -68,6 +44,37 @@ class Scanner
         $new_list = file_get_contents(self::GIST);
         if(strlen($new_list) > 0) {
             file_put_contents(self::WISH_LIST, $new_list);
+        }
+    }
+
+    /**
+     * @param array $wish_list
+     */
+    public function checkOnlineWithApi(array $wish_list): void
+    {
+        $active_cache = [];
+        foreach ($wish_list as $username => $line) {
+            $json = file_get_contents(self::GRABBER_URL . $username);
+            $obj = json_decode($json);
+
+            foreach ($obj->users as $elem) {
+                $username = strtolower($elem->username);
+                $url = $elem->hlsPreviewUrl;
+                $tags = $elem->showTags;
+
+                if ($url === '' || $username === '') {
+                    echo "$username has no active url.\n";
+                    continue;
+                }
+                $active_cache["$username"] = [
+                    'url' => $url,
+                    'tags' => $tags,
+                    'timestamp' => time()
+                ];
+                exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s') . ".ts \n");
+
+            }
         }
     }
 }
