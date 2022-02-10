@@ -11,7 +11,7 @@ class Scanner
                 $this->refreshWishList();
                 $wish_list = $this->readWishList();
                 if(sizeof($wish_list) > 0) {
-                    $this->checkOnlineWithApi($wish_list);
+                    $this->checkOnlineOverApi($wish_list);
                     $time_out = rand(60, 120);
                     echo "Sleeping for $time_out seconds.\n";
                     sleep($time_out);
@@ -50,7 +50,7 @@ class Scanner
     /**
      * @param array $wish_list
      */
-    public function checkOnlineWithApi(array $wish_list): void
+    public function checkOnlineOverApi(array $wish_list): void
     {
         $active_cache = [];
         foreach ($wish_list as $username => $line) {
