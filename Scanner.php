@@ -7,10 +7,10 @@ class Scanner
     const GIST = 'https://gist.githubusercontent.com/scanningAnton/cb4a2bac7bc5b570a99c6210ad7e36a7/raw';
 
     public function run() {
-        $this->refreshWishList();
-        $wish_list = $this->readWishList();
-        if(sizeof($wish_list) > 0) {
             while(true){
+                $this->refreshWishList();
+                $wish_list = $this->readWishList();
+                if(sizeof($wish_list) > 0) {
                 $active_cache = [];
                 foreach($wish_list as $username => $line) {
                     $json = file_get_contents(self::GRABBER_URL . $username);
@@ -30,12 +30,12 @@ class Scanner
                             'tags' => $tags,
                             'timestamp' => time()
                         ];
-                        #exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                        exec("php Recorder.php $username $url > /dev/null 2>&1 &");
                         echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s').".ts \n");
 
                     }
                 }
-                $time_out = rand(30, 120);
+                $time_out = rand(1, 10);
                 echo "Sleeping for $time_out seconds.\n";
                 sleep($time_out);
                 #exit();
