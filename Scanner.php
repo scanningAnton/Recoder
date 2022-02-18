@@ -4,7 +4,7 @@ class Scanner
 {
     const WISH_LIST = 'wishlist.txt';
     #const GRABBER_URL = 'https://www.cam4.com/directoryCams?directoryJson=true&online=true&url=true&username=';
-    const GRABBER_URL = 'https://www.cam4.com/rest/v1.0/profile/';
+    const GRABBER_URL = 'https://www.cam4.com/rest/v1.0/profile/%s/streamInfo';
     const GIST = 'https://gist.githubusercontent.com/scanningAnton/cb4a2bac7bc5b570a99c6210ad7e36a7/raw';
 
     public function run() {
@@ -55,7 +55,7 @@ class Scanner
     {
         $active_cache = [];
         foreach ($wish_list as $username => $line) {
-            $json = file_get_contents(self::GRABBER_URL . $username . '/streamInfo');
+            $json = file_get_contents(sprintf(self::GRABBER_URL, $username));
             if(strlen($json) > 0){
                 $obj = json_decode($json);
 
@@ -72,7 +72,7 @@ class Scanner
                     'url' => $url,
                     'timestamp' => time()
                 ];
-                exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                #exec("php Recorder.php $username $url > /dev/null 2>&1 &");
                 echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s') . ".ts \n");
             }
         }
