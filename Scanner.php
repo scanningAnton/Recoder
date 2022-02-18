@@ -3,7 +3,8 @@ require_once 'Recorder.php';
 class Scanner
 {
     const WISH_LIST = 'wishlist.txt';
-    const GRABBER_URL = 'https://www.cam4.com/directoryCams?directoryJson=true&online=true&url=true&username=';
+    #const GRABBER_URL = 'https://www.cam4.com/directoryCams?directoryJson=true&online=true&url=true&username=';
+    const GRABBER_URL = 'https://www.cam4.com/rest/v1.0/profile/';
     const GIST = 'https://gist.githubusercontent.com/scanningAnton/cb4a2bac7bc5b570a99c6210ad7e36a7/raw';
 
     public function run() {
@@ -41,7 +42,7 @@ class Scanner
 
     protected function refreshWishList() : void
     {
-        $new_list = file_get_contents(self::GIST);
+        $new_list = file_get_contents(self::GIST . '?' . time());
         if(strlen($new_list) > 0) {
             file_put_contents(self::WISH_LIST, $new_list);
         }
@@ -54,13 +55,14 @@ class Scanner
     {
         $active_cache = [];
         foreach ($wish_list as $username => $line) {
-            $json = file_get_contents(self::GRABBER_URL . $username);
-            $obj = json_decode($json);
+            $json = file_get_contents(self::GRABBER_URL . $username . '/streamInfo');
+            if(strlen($json) > 0){
+                $obj = json_decode($json);
 
-            foreach ($obj->users as $elem) {
-                $username = strtolower($elem->username);
-                $url = $elem->hlsPreviewUrl;
-                $tags = $elem->showTags;
+                $url = $obj->cdnURL;
+                if( $url === "" ){
+                    $url = $obj->edgeURL;
+                }
 
                 if ($url === '' || $username === '') {
                     echo "$username has no active url.\n";
@@ -68,12 +70,10 @@ class Scanner
                 }
                 $active_cache["$username"] = [
                     'url' => $url,
-                    'tags' => $tags,
                     'timestamp' => time()
                 ];
-                exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                #exec("php Recorder.php $username $url > /dev/null 2>&1 &");
                 echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s') . ".ts \n");
-
             }
         }
     }
