@@ -13,7 +13,7 @@ class Scanner
                 $wish_list = $this->readWishList();
                 if(sizeof($wish_list) > 0) {
                     $this->checkOnlineOverApi($wish_list);
-                    $time_out = rand(60, 120);
+                    $time_out = rand(60, 300);
                     echo "Sleeping for $time_out seconds.\n";
                     sleep($time_out);
             }
@@ -72,7 +72,7 @@ class Scanner
                     'url' => $url,
                     'timestamp' => time()
                 ];
-                #exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                exec("php Recorder.php $username $url > /dev/null 2>&1 &");
                 echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s') . ".ts \n");
             }
         }
