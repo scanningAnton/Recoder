@@ -72,7 +72,7 @@ class Scanner
                     'url' => $url,
                     'timestamp' => time()
                 ];
-                #exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                exec("php Recorder.php $username $url > /dev/null 2>&1 &");
                 echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s') . ".ts \n");
             }
         }
