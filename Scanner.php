@@ -33,7 +33,7 @@ class Scanner
             $wish_list = array_flip($wish_list);
             echo sprintf("Found %s entries in wishlist.\n", count($wish_list));
         }
-        if($wish_list === false){
+        if(!$wish_list){
             return [];
         }
         return $wish_list;
@@ -71,9 +71,12 @@ class Scanner
                     'tags' => $tags,
                     'timestamp' => time()
                 ];
-                exec("php Recorder.php $username $url > /dev/null 2>&1 &");
-                echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s') . ".ts \n");
-
+                try{
+                    exec("php Recorder.php $username $url > /dev/null 2>&1 &");
+                    echo("ffmpeg -i $url  video/$username" . '_' . date('Y-m-d_h_i_s') . ".ts \n");
+                } catch (Exception $e) {
+                    echo("Exception found ". $e->getMessage() ." \n");
+                }
             }
         }
     }
